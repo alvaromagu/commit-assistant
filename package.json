@@ -1,0 +1,25 @@
+{
+	"name": "commit-assistant",
+	"version": "1.0.0",
+	"description": "Commit Assistant Generator",
+	"type": "module",
+	"main": "src/index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "node --watch src/index.js"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@bdsqqq/try": "2.3.1",
+		"@clack/prompts": "0.6.1",
+		"picocolors": "1.0.0"
+	},
+	"devDependencies": {
+		"standard": "^17.0.0"
+	},
+	"eslintConfig": {
+		"extends": "standard"
+	}
+}
