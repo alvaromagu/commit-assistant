@@ -1,6 +1,7 @@
 import { trytm } from '@bdsqqq/try'
 import { intro, outro, select, isCancel, multiselect, confirm, group, text, note } from '@clack/prompts'
 import colors from 'picocolors'
+import { style } from './colorsUtils.js'
 import { commitTypes } from './commit-types.js'
 import { getChangedFiles, isGitInRepository, getStagedFiles, gitAdd, gitCommit } from './git.js'
 import { exitProgram } from './utils.js'
@@ -9,16 +10,16 @@ if ((!await isGitInRepository())) {
   exitProgram({ code: 1, message: 'No te encuentras en ningún repositorio' })
 }
 
-intro('Bienvenido al generador de commits')
+intro(style(' Bienvenido al generador de commits ', { bg: colors.bgCyan, style: colors.bold }))
 
 const [changedFiles, changedFilesErr] = await trytm(getChangedFiles())
 const [stagedFiles, stagedFilesErr] = await trytm(getStagedFiles())
 
 if (stagedFilesErr !== null || changedFilesErr !== null) {
-  exitProgram({ code: 1, message: 'Error al cargar los ficheros cambiados' })
+  exitProgram({ code: 1, message: style('Error al cargar los ficheros cambiados', { bg: colors.bgRed, color: colors.white }), customStyle: true })
 }
 if (stagedFiles.length === 0 && changedFiles.length === 0) {
-  exitProgram({ message: 'Error, no hay cambios en el repositorio' })
+  exitProgram({ message: colors.green('No hay cambios en el repositorio'), customStyle: true })
 }
 
 if (stagedFiles.length > 0) {
@@ -44,7 +45,7 @@ if (stagedFiles.length > 0) {
 }
 
 const selectedFiles = await multiselect({
-  message: 'Selecciona los ficheros que quieres añadir:',
+  message: colors.blue('Selecciona los ficheros que quieres añadir:'),
   options: changedFiles.map(file => ({ value: file, message: file })),
   required: stagedFiles.length === 0
 })
@@ -53,7 +54,7 @@ if (isCancel(selectedFiles)) {
 }
 
 const commitType = await select({
-  message: 'Selecciona el tipo de commit',
+  message: colors.blue('Selecciona el tipo de commit'),
   options: Object.entries(commitTypes).map(([key, value]) => {
     return { value: { ...value, key }, label: `${value.emoji} ${key.padEnd(10, ' ')} · ${value.description}` }
   })
@@ -63,7 +64,7 @@ if (isCancel(commitType)) {
 }
 
 const commitMessage = await text({
-  message: 'Introduce el mensaje del commit:',
+  message: colors.blue('Introduce el mensaje del commit:'),
   prompt: 'Mensaje',
   validate: (input) => {
     if (!input || input.length === 0) {
@@ -82,10 +83,10 @@ const { confirmResult } = await group(
     resume: () => {
       const resume = `Ficheros añadidos  -> [ ${[...stagedFiles, ...selectedFiles].join(' | ')} ]
 Mensaje del commit -> ${formattedMessage}`
-      note(resume, 'Resumen')
+      note(resume, colors.blue('Resumen'))
     },
     confirmResult: () => confirm({
-      message: 'A continuación se realizara el commit, ¿desea continuar?'
+      message: colors.blue('A continuación se realizara el commit, ¿desea continuar?')
     })
   },
   {
